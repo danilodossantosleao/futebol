@@ -1,7 +1,11 @@
+// src/screens/LoginScreen.js
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, ImageBackground, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebaseConfig';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -10,15 +14,24 @@ const LoginScreen = () => {
   const navigation = useNavigation();
 
   const handleLogin = () => {
-    if (email && password) {  // Supõe que se ambos estão preenchidos, está correto.
-      navigation.navigate('Home');  // Navega para a tela Home
+    if (email && password) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          navigation.navigate('Home');
+        })
+        .catch((error) => {
+          Alert.alert("Erro", error.message);
+        });
     } else {
       Alert.alert("Erro", "Por favor preencha todos os campos.");
     }
   };
 
   return (
-    <ImageBackground source={require('../../assets/fundo.png')} style={styles.background}>
+    <ImageBackground source={require('../../assets/penha.jpg')} style={styles.background}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color="white" />
+      </TouchableOpacity>
       <Text style={styles.header}>Bem-Vindo(a)</Text>
       <View style={styles.inputContainer}>
         <TextInput
@@ -62,6 +75,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -92,7 +110,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    backgroundColor: 'orange',
+    backgroundColor: 'blue',
     padding: 15,
     width: '100%',
     borderRadius: 5,

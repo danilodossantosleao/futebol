@@ -1,6 +1,10 @@
+// src/screens/CadastroScreen.js
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, ImageBackground, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebaseConfig';
+import { Ionicons } from '@expo/vector-icons';
 
 const CadastroScreen = () => {
   const [nome, setNome] = useState('');
@@ -14,21 +18,30 @@ const CadastroScreen = () => {
     if (!nome || !email || !senha || !confirmarSenha) {
       Alert.alert("Erro ao cadastrar", "Todos os campos são obrigatórios.");
     } else if (!emailRegex.test(email)) {
-      Alert.alert("Formato de email inválido");
+      Alert.alert("Erro ao cadastrar", "Formato de email inválido");
     } else if (senha !== confirmarSenha) {
-      Alert.alert("Senhas não conferem");
+      Alert.alert("Erro ao cadastrar", "Senhas não conferem");
     } else {
-      Alert.alert("Cadastro Bem-sucedido!", "Você será redirecionado para a tela de login.", [
-        {
-          text: "OK",
-          onPress: () => navigation.navigate('Login')
-        }
-      ]);
+      createUserWithEmailAndPassword(auth, email, senha)
+        .then((userCredential) => {
+          Alert.alert("Cadastro Bem-sucedido!", "Você será redirecionado para a tela de login.", [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate('Login')
+            }
+          ]);
+        })
+        .catch((error) => {
+          Alert.alert("Erro ao cadastrar", error.message);
+        });
     }
   };
 
   return (
-    <ImageBackground source={require('../../assets/bayer.png')} style={styles.background}>
+    <ImageBackground source={require('../../assets/penha.jpg')} style={styles.background}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color="white" />
+      </TouchableOpacity>
       <Text style={styles.header}>CADASTRO</Text>
       <View style={styles.inputContainer}>
         <TextInput
@@ -74,6 +87,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -91,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: 'orange',
+    backgroundColor: 'blue',
     padding: 15,
     width: '100%',
     borderRadius: 5,
@@ -104,3 +122,4 @@ const styles = StyleSheet.create({
 });
 
 export default CadastroScreen;
+  

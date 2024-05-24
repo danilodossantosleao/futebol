@@ -6,7 +6,7 @@ const WelcomeScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <ImageBackground source={require('../../assets/fundo.png')} style={styles.background}>
+    <ImageBackground source={require('../../assets/penha.jpg')} style={styles.background}>
       <View style={styles.content}>
         <Text style={styles.title}></Text>
         <Text style={styles.subtitle}></Text>
